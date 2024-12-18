@@ -7,9 +7,19 @@ This Julia package is intended to provide a set of tools for generating vibratio
 
 The package is under active development and is not yet registered in the Julia General Registry. The package is developed as part of my research activities on source identification in structural dynamics and acoustics.
 
-At the moment, the package provides the following functionalities:
+## Installation
 
-**Mechanical models**
+The package is not yet registered in the Julia General Registry. To install the package, you can use the following command:
+
+```julia
+(Yourenv) pkg> add "git@https://github.com/maucejo/VibrationData.jl.git"
+```
+
+## Package features
+
+The package is organized into the following functionalities:
+
+### Mechanical models
 
 - [ ] Single-degree-of-freedom (SDOF) systems
 - [ ] Discrete multi-degree-of-freedom (MDOF) systems
@@ -28,7 +38,7 @@ At the moment, the package provides the following functionalities:
         - Free-free
     - [x] Simply-supported plate
 
-**Vibration data generation**
+### Vibration data generation
 
 - [x] Time-domain integration scheme for linear systems
     - Central difference scheme
@@ -44,7 +54,7 @@ At the moment, the package provides the following functionalities:
         - [x] Modal summation
         - [ ] Direct method
 
-**Measurement noise** 
+### Measurement noise
 
 - [x] Addition of Gaussian white noise with a prescribed SNR
 - [x] Measurement noise variance estimation algorithms from noisy data
