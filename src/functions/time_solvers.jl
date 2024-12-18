@@ -151,7 +151,7 @@ function _CentralDiff(prob::LinearTimeProblem, u0)
     A[:, 1] = LU\rhs0
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
-    p = Progress(nt - 1; color = :black, barlen = 75, showspeed = true)
+    p = Progress(nt - 1; desc = "Central difference...", color = :black, barlen = 75, showspeed = true)
     for n in 1:nt-1
         next!(p)
         if n == 1
@@ -189,7 +189,7 @@ end
     LU = lu(M)
     A[:, 1] = LU\rhs0
 
-    p = Progress(nt - 1; color=:black, barlen=75, showspeed=true)
+    p = Progress(nt - 1; desc = "RK4...", color=:black, barlen=75, showspeed=true)
     for n = 1:nt-1
         next!(p)
         Fn_2 = (F[:, n+1] + F[:, n])./2
@@ -213,6 +213,22 @@ end
 function _NK(prob::LinearTimeProblem, u0, alg) # Newmark-Family
     (; K, M, C, F, t) = prob
     (; αf, αₘ, γ₀, β₀) = alg
+
+    if alg isa FoxGoodwin
+        desc = "Fox-Goodwin..."
+    elseif alg isa LinearAcceleration
+        desc = "Linear acceleration..."
+    elseif alg isa Newmark
+        desc = "Newmark..."
+    elseif alg isa HHT
+        desc = "HHT..."
+    elseif alg isa WBZ
+        desc = "WBZ..."
+    elseif alg isa GeneralizedAlpha
+        desc = "Generalized-α..."
+    elseif alg isa MidPoint
+        desc = "Mid-point rule..."
+    end
 
     nt = length(t)
     h = (maximum(t) - minimum(t))/(nt - 1) # Pas de temps
@@ -253,7 +269,7 @@ function _NK(prob::LinearTimeProblem, u0, alg) # Newmark-Family
     S = @. b₆*M + b₃*C + b₄*K
     LU = lu(S)
 
-    p = Progress(nt - 1; color = :black, barlen = 75, showspeed = true)
+    p = Progress(nt - 1; desc = desc, color = :black, barlen = 75, showspeed = true)
     for n = 1:nt-1
         next!(p)
         rhs = b₈.*F[:, n+1] + b₉.*F[:, n] - C*(b₁.*A[:, n] + V[:, n]) - K*(b₂.*A[:, n] + b₅.*V[:, n] + D[:, n]) - b₇.*(M*A[:, n])

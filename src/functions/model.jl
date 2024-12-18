@@ -14,5 +14,5 @@ Calcul des matrices de masses raideur et amortissement généralisé
     * Cₙ : Matrice de masse généralisée
 """
 function modal_model(ωₙ, ξₙ)
-    return Diagonal(ωₙ.^2), Diagonal(ones(length(ωₙ))), Diagonal(2ξₙ.*ωₙ)
+    return Diagonal(ωₙ.^2), I(length(ωₙ)), Diagonal(2ξₙ.*ωₙ)
 end

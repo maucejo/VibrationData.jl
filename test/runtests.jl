@@ -135,27 +135,72 @@ end
 
     ϕₒ = eigmode(plaq, kₙ, loc[1], loc[2])
 
-    prob = TimeProblem(Kₙ, Mₙ, Cₙ, Fₙ, t)
+    prob = LinearTimeProblem(Kₙ, Mₙ, Cₙ, Fₙ, t)
     CI = (D₀ = zeros(Nmodes), V₀ = zeros(Nmodes))
 
-    solGα = solve(prob, CI, :Gα)
+    # Generalized-α
+    solGα = solve(prob, CI, GeneralizedAlpha())
     (; A) = solGα
     AccGα = ϕₒ*A
 
-    solCD = solve(prob, CI, :CD)
+    # Central difference
+    solCD = solve(prob, CI, CentralDiff())
     (; A) = solCD
     AccCD = ϕₒ*A
 
-    solRK4 = solve(prob, CI, :RK4)
+    # HHT
+    solHHT = solve(prob, CI, HHT())
+    (; A) = solHHT
+    AccHHT = ϕₒ*A
+
+    # Fox-Goodwin
+    solFG = solve(prob, CI, FoxGoodwin())
+    (; A) = solFG
+    AccFG = ϕₒ*A
+
+    # Linear acceleration
+    solLA = solve(prob, CI, LinearAcceleration())
+    (; A) = solLA
+    AccLA = ϕₒ*A
+
+    # Newmark
+    solNM = solve(prob, CI, Newmark())
+    (; A) = solNM
+    AccNM = ϕₒ*A
+
+    # WBZ
+    solWBZ = solve(prob, CI, WBZ())
+    (; A) = solWBZ
+    AccWBZ = ϕₒ*A
+
+    # Mid-point
+    solMP = solve(prob, CI, MidPoint())
+    (; A) = solMP
+    AccMP = ϕₒ*A
+
+    # RK4
+    solRK4 = solve(prob, CI, RK4())
     (; A) = solRK4
     AccRK4 = ϕₒ*A
 
     energyGα = sum(abs2, AccGα)
     energyCD = sum(abs2, AccCD)
+    energyHHT = sum(abs2, AccHHT)
+    energyFG = sum(abs2, AccFG)
+    energyLA = sum(abs2, AccLA)
+    energyNM = sum(abs2, AccNM)
+    energyWBZ = sum(abs2, AccWBZ)
+    energyMP = sum(abs2, AccMP)
     energyRK4 = sum(abs2, AccRK4)
 
     @test round(sum(abs2, AccGα), digits = 2) == 866.97
     @test (abs(energyCD - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyHHT - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyFG - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyLA - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyNM - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyWBZ - energyGα)/energyGα) ≤ 1e-2
+    @test (abs(energyMP - energyGα)/energyGα) ≤ 1e-2
     @test (abs(energyRK4 - energyGα)/energyGα) ≤ 1e-2
 end
 

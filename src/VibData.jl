@@ -15,7 +15,7 @@ export excitation,
 
 # Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
-       Newmark, HHT, GeneralizedAlpha, MidPoint
+       Newmark, HHT, WBZ, GeneralizedAlpha, MidPoint
 
 # Noise utils
 export agwn, varest, estimated_SNR
