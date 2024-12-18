@@ -1,4 +1,4 @@
-module VibData
+module VibrationData
 
 using Parameters, ProgressMeter, LinearAlgebra, SparseArrays
 

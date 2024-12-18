@@ -1,26 +1,26 @@
 """
     excitation(param, t)
 
-Calcul de différents type de signaux d'excitation
+Computes different types of excitation signals
 
-# Paramètres
-* param : NamedTuple ou struct contenant les champs suivants :
-    * type : type de l'excitation
+# Parameters
+* param : NamedTuple or struct containing the following fields:
+    * type : type of excitation
         1. :triangle
         2. :rectangle
         3. :marteau
         4. :srect (smooth rectangle)
-    * F₀ : Amplitude de l'effort [N]
-    * td : Instant de déclenchement de l'effort [s]
-    * duree : Durée de l'excitation [s]
-        *note : Obligatoire pour les type 1, 2 et 4, inutile pour le type 3*
-    * k et θ : Paramètre de forme [-] et paramètre d'intensité [s]
-        *note : Obligatoire pour le type 3, inutile pour les autres types*
-    * tm : Temps de montée entre 0 et F₀ [s]
-        *note : Obligatoire pour le type 4, inutile pour les autres*
+    * F₀ : Amplitude of the force [N]
+    * td : Time of force initiation [s]
+    * duree : Duration of the excitation [s]
+        *note : Mandatory for types 1, 2, and 4, not needed for type 3*
+    * k and θ : Shape parameter [-] and intensity parameter [s]
+        *note : Mandatory for type 3, not needed for other types*
+    * tm : Rise time from 0 to F₀ [s]
+        *note : Mandatory for type 4, not needed for other types*
 
-# Sortie
-* F : Vecteur d'évolution de l'excitation en fonction du temps [N]
+# Output
+* F : Vector of excitation evolution over time [N]
 """
 function excitation(param, t)
     (; type, F₀, td) = param
@@ -45,16 +45,16 @@ end
 """
     triangle(F₀, td, duree, t)
 
-Calcul du vecteur d'excitation pour un signal triangulaire
+Computes the excitation vector for a triangular signal
 
-# Paramètres
-* F0 : Amplitude de l'excitation [N]
-* td : Instant de déclenchement de l'effort [s]
-* duree : Durée de l'excitation [s]
-* t : Discrétisation temporelle [s]
+# Parameters
+* F₀ : Amplitude of the excitation [N]
+* td : Time of force initiation [s]
+* duree : Duration of the excitation [s]
+* t : Time discretization [s]
 
-# Sortie
-* Ft : Vecteur d'évolution de l'excitation en fonction du temps [N]
+# Output
+* Ft : Vector of excitation evolution over time [N]
 """
 function triangle(F₀, td, duree, t)
     Ft = zeros(length(t))
@@ -74,16 +74,16 @@ end
 """
     rectangle(F₀, td, duree, t)
 
-Calcul du vecteur d'excitation pour un signal de type créneau
+Computes the excitation vector for a rectangular signal
 
-# Paramètres
-* F0 : Amplitude de l'excitation [N]
-* td : Instant de déclenchement de l'effort [s]
-* duree : Durée de l'excitation [s]
-* t : Discrétisation temporelle [s]
+# Parameters
+* F₀ : Amplitude of the excitation [N]
+* td : Time of force initiation [s]
+* duree : Duration of the excitation [s]
+* t : Time discretization [s]
 
-# Sortie
-* Ft : Vecteur d'évolution de l'excitation en fonction du temps [N]
+# Output
+* Ft : Vector of excitation evolution over time [N]
 """
 function rectangle(F₀, td, duree, t)
     Ft = zeros(length(t))
@@ -101,19 +101,19 @@ end
 """
     marteau(F₀, td, k, θ, t)
 
-Calcul du vecteur d'excitation pour un signal de type coup de marteau
-L'excitation par coup de marteau est supposée avoir la forme d'une loi gamma
-de paramètres (k, theta)
+Computes the excitation vector for a hammer impact signal
+The hammer impact is assumed to have the shape of a gamma distribution
+with parameters (k, theta)
 
-# Paramètres
-* F0 : Amplitude de l'excitation [N]
-* td : Instant de déclenchement de l'effort [s]
-* k : Paramètre de forme
-* θ : Paramètre d'intensité [s]
-* t : Discrétisation temporelle [s]
+# Parameters
+* F₀ : Amplitude of the excitation [N]
+* td : Time of force initiation [s]
+* k : Shape parameter
+* θ : Intensity parameter [s]
+* t : Time discretization [s]
 
-# Sortie
-* Ft : Vecteur d'évolution de l'excitation en fonction du temps [N]
+# Output
+* Ft : Vector of excitation evolution over time [N]
 """
 function marteau(F₀, td, k, θ, t)
     Ft = zeros(length(t))
@@ -134,19 +134,18 @@ end
 """
     smooth_rect(F₀, td, tm, duree, t)
 
-Calcul du vecteur d'excitation pour un signal créneau dont les discontinuités
-sont adoucies.
-L'excitation est modélisée par une fenêtre de Tuckey
+Computes the excitation vector for a smooth rectangular signal.
+The excitation is modeled by a Tuckey window.
 
-# Paramètres
-* F0 : Amplitude de l'excitation [N]
-* td : Instant de déclenchement de l'effort [s]
-* tm : Temps de montée entre 0 et F₀ [s]
-* duree : Durée de l'excitation [s]
-* t : Discrétisation temporelle [s]
+# Parameters
+* F₀ : Amplitude of the excitation [N]
+* td : Time of force initiation [s]
+* tm : Rise time from 0 to F₀ [s]
+* duree : Duration of the excitation [s]
+* t : Time discretization [s]
 
-# Sortie
-* Ft : Vecteur d'évolution de l'excitation en fonction du temps [N]
+# Output
+* Ft : Vector of excitation evolution over time [N]
 """
 function smooth_rect(F₀, td, tm, duree, t)
     Ft = zeros(length(t))

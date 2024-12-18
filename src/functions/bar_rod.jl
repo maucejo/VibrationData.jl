@@ -1,16 +1,16 @@
 """
-Structure contenant les données de la barre en traction-compression considérée homogène et isotrope
+Structure containing the data of a homogeneous and isotropic longitudinal bar
 
-# Paramètres du problème
-* L: Longueur [m]
-* S: Aire de la section [m²]
-* E: Module d'Young [Pa]
-* ρ: Masse volumique [kg/m³]
+# Problem parameters
+* L: Length [m]
+* S: Cross-section area [m²]
+* E: Young's modulus [Pa]
+* ρ: Mass density [kg/m³]
 
-# Paramètres du modèle
-* L : Longueur [m]
-* m : Masse linéique [kg/m]
-* D : Coefficient de raideur [Pa]
+# Model parameters
+* L : Length [m]
+* m : Line mass [kg/m]
+* D : Stiffness coefficient [Pa]
 """
 @with_kw struct Bar
     L::Float64
@@ -26,19 +26,20 @@ Structure contenant les données de la barre en traction-compression considéré
 end
 
 """
-Structure contenant les données de la barre en torsion considérée homogène et isotrope
+Structure containing the data of a homogeneous and isotropic torsional bar
 
-# Paramètres du constructeur
-* L: Longueur [m]
-* I: Moment d'inertie [m⁴]
-* J: Moment de torsion [m⁴]
-* G: Module de Coulomb [Pa]
-* ρ: Masse volumique [kg/m³]
 
-# Paramètre de la structure
-* L : Longueur [m]
-* m : Coefficient d'inertie [kg.m]
-* D : Coefficient de raideur [Pa.m²]
+# Problem parameters
+* L: Length [m]
+* I: Second-moment of area [m⁴]
+* J: Torsion constant [m⁴]
+* G: Shear modulus [Pa]
+* ρ: Mass density [kg/m³]
+
+# Model parameters
+* L : Length [m]
+* m : Line mass [kg/m]
+* D : Stiffness coefficient [Pa]
 """
 @with_kw struct Rod
     L :: Float64
@@ -57,25 +58,25 @@ end
     eigval(b::Bar, fmax, bc)
     eigval(b::Rod, fmax, bc)
 
-Calcul les fréquences propres d'une barre en traction-compression ou en torsion jusqu'à fmax
+Computes the natural frequencies of a longitudinal or torsional bar up to fmax
 
-# Paramètres
-* p: Structure contenant les données relative à la barre
-* fₘₐₓ: Fréquence maximale de calcul des déformées modales [Hz]
-* bc: Conditions aux limites
-    * :CC : Encastrée - Encastrée
-    * :CF : Encastrée - Libre
-    * :FF : Libre - Libre
+# Parameters
+* p: Structure containing the bar data
+* fmax: Maximum frequency for calculating the mode shapes [Hz]
+* bc: Boundary conditions
+    * :CC : Clamped - Clamped
+    * :CF : Clamped - Free
+    * :FF : Free - Free
 
-# Sorties
-* ωₙ: Pulsations propres calculées jusqu'à ωmax = 2π*fmax [Hz]
-* kₙ: Vecteur des nombres d'onde modaux
+# Outputs
+* ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* kₙ: Vector of modal wavenumbers
 """
-function eigval(b, fₘₐₓ, bc = :CC)
+function eigval(b, fmax, bc = :CC)
     (; L, m, D) = b
 
     c = sqrt(D/m)
-    ωₘₐₓ = 2π*fₘₐₓ
+    ωmax = 2π*fmax
 
     ωₙ = Float64[]
     kₙ = Float64[]
@@ -83,7 +84,7 @@ function eigval(b, fₘₐₓ, bc = :CC)
         n = 1
         kᵢ = n*π/L
         ωᵢ = c*kᵢ
-        while ωᵢ ≤ ωₘₐₓ
+        while ωᵢ ≤ ωmax
             push!(ωₙ, ωᵢ)
             push!(kₙ, kᵢ)
             n += 1
@@ -94,7 +95,7 @@ function eigval(b, fₘₐₓ, bc = :CC)
         n = 1
         kᵢ = (2n - 1)π/L
         ωᵢ = c*kᵢ
-        while ωᵢ ≤ ωₘₐₓ
+        while ωᵢ ≤ ωmax
             push!(ωₙ, ωᵢ)
             push!(kₙ, kᵢ)
             n += 1
@@ -105,7 +106,7 @@ function eigval(b, fₘₐₓ, bc = :CC)
         n = 0
         kᵢ = 0.
         ωᵢ = 0.
-        while ωᵢ ≤ ωₘₐₓ
+        while ωᵢ ≤ ωmax
             push!(ωₙ, ωᵢ)
             push!(kₙ, kᵢ)
             n += 1
@@ -123,19 +124,19 @@ end
     eigmode(b::Bar, kₙ, x, bc)
     eigmode(b::Rod, kₙ, x, bc)
 
-Calcul les déformées propres d'une barre en traction-compression ou en torsion
+Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 
-# Paramètres
-* b: Structure contenant les données relative à la barre
-* kₙ: Vecteur des nombres d'ondes modaux
-* x: Coordonnées des points de calcul des déformées
-* bc: Conditions aux limites
-    * :CC : Encastrée - Encastrée
-    * :CF : Encastrée - Libre
-    * :FF : Libre - Libre
+# Parameters
+* b: Structure containing the bar data
+* kₙ: Array of modal wavenumbers
+* x: Coordinates of calculation points of the mode shapes
+* bc: Boundary conditions
+    * :CC : Clamped - Clamped
+    * :CF : Clamped - Free
+    * :FF : Free - Free
 
-# Sorties
-* ϕ: Déformées modales normalisées à la masse
+# Output
+* ϕ: Mass-normalized mode shapes
 """
 function eigmode(b, kₙ, x, bc = :CC)
     (; L, m) = b

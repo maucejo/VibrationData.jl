@@ -1,18 +1,18 @@
 """
-Structure contenant les données de la plaque en flexion considérée homogène et isotrope
+Structure containing the data of a homogeneous and isotropic bending plate
 
-# Paramètres du problème
-* L : Longueur [m]
-* b : Largeur [m]
-* E : Module d'Young [Pa]
-* ρ : Masse volumique [kg/m³]
-* ν : Coefficient de Poisson
+# Problem parameters
+* L : Length [m]
+* b : Width [m]
+* E : Young's modulus [Pa]
+* ρ : Density [kg/m³]
+* ν : Poisson's ratio
 
-# Paramètres du modèle
-* L : Longueur [m]
-* b : Largeur [m]
-* m : Masse surfacique [kg/m²]
-* D : Raideur de flexion [N.m]
+# Model parameters
+* L : Length [m]
+* b : Width [m]
+* m : Surface mass [kg/m²]
+* D : Bending stiffness [N.m]
 """
 @with_kw struct Plate
     L::Float64
@@ -32,15 +32,15 @@ end
 """
     eigval(p::Plate, fₘₐₓ)
 
-Calcul les fréquences propres d'une plaque simplement appuyée jusqu'à fmax
+Computes the natural frequencies of a simply supported plate up to fmax
 
-# Paramètres
-    * p : Structure contenant les données relative à la plaque
-    * fₘₐₓ : Fréquence maximale de calcul des déformées modales [Hz]
+# Parameters
+    * p : Structure containing the data related to the plate
+    * fₘₐₓ : Maximum frequency for calculating the modal shapes [Hz]
 
-# Sorties
-    * ωₘₙ : Pulsations propres calculées jusqu'à ωmax = 2π*fmax [Hz]
-    * kₘₙ : Matrice des nombres d'ondes modaux
+# Outputs
+    * ωₘₙ : Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+    * kₘₙ : Matrix of modal wave numbers
 """
 function eigval(p::Plate, fₘₐₓ)
    (; L, b, m, D) = p
@@ -87,15 +87,15 @@ end
 """
     eigmode(p::Plate, kₘₙ, X, Y)
 
-Calcul les déformées propres d'une plaque simplement appuyée
+Computes the mass-normalized mode shapes of a simply supported plate
 
-# Paramètres
-    * p : Structure contenant les données relative à la plaque
-    * kₘₙ : Matrice des nombres d'onde modaux
-    * (X, Y): Coordonnées des points de calcul des déformées
+# Parameters
+    * p : Structure containing the data related to the plate
+    * kₘₙ : Matrix of modal wave numbers
+    * (X, Y): Coordinates of the points where the mode shapes are calculated
 
-# Sorties
-    * ϕ: Déformées modales normalisées à la masse
+# Output
+    * ϕ: Mass-normalized mode shapes
 """
 @views function eigmode(p::Plate, kₘₙ, X, Y)
     (; L, b, m) = p

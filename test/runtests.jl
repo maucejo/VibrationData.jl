@@ -4,7 +4,7 @@ using TestItemRunner
 
 @run_package_tests
 
-@testitem "Modes plaque" begin
+@testitem "Plate modes" begin
     plaq = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     ## Définition des fréquences jusqu'à fmax
@@ -15,7 +15,7 @@ using TestItemRunner
     @test round(ωₙ[end]/2π, digits = 2) == 933.48
 end
 
-@testitem "Modes barre TC" begin
+@testitem "Longitudinal bar modes" begin
     L = 1.
     S = 3e-4
     E = 2.1e11
@@ -30,7 +30,7 @@ end
     @test round(ωₙ[end]/2π, digits = 2) == 7783.12
 end
 
-@testitem "Modes barre Torsion" begin
+@testitem "Torsional bar modes" begin
     L = 1.
     I = π*(1e-2^4)/32.
     J = I
@@ -46,7 +46,7 @@ end
     @test round(ωₙ[end]/2π, digits = 2) == 9544.27
 end
 
-@testitem "Modes poutre" begin
+@testitem "Beam modes" begin
     L = 1.
     b = 3e-2
     h = 1e-2
@@ -64,7 +64,7 @@ end
     @test round(ωₙ[end]/2π, digits = 2) == 847.02
 end
 
-@testitem "Effort rect" begin
+@testitem "Rectangular shape force" begin
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
     t = 0.:Δt:tf
@@ -77,7 +77,7 @@ end
     @test sum(diff(Ft)) == 0.
 end
 
-@testitem "Effort marteau" begin
+@testitem "Impact force" begin
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
     t = 0.:Δt:tf
@@ -89,7 +89,7 @@ end
     @test round(length(t)*sum(Ft)*Δt) == 314.
 end
 
-@testitem "Effort triangle" begin
+@testitem "Triangle shape force" begin
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
     t = 0.:Δt:tf
@@ -101,7 +101,7 @@ end
     @test isapprox(sum(diff(Ft)), 0., atol = eps())
 end
 
-@testitem "Effort smooth rectangle" begin
+@testitem "Smooth rectangle shape force" begin
     Δt = 1e-6 # Pas de temps
     tf = 0.07 # instant final
     t = 0.:Δt:tf
@@ -113,7 +113,7 @@ end
     @test sum(diff(Ft)) == 0.
 end
 
-@testitem "Solveurs temporels" begin
+@testitem "Time solvers" begin
     plaq = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     fmax = 1e3
@@ -204,7 +204,7 @@ end
     @test (abs(energyRK4 - energyGα)/energyGα) ≤ 1e-2
 end
 
-@testitem "FRF modal" begin
+@testitem "Modal FRF" begin
     plaq = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     ## Définition des fréquences jusqu'à fmax

@@ -1,15 +1,15 @@
 """
-Structure contenant les données alimentant le solver modal de calcul d'une FRF
+Structure containing the data feeding the modal solver for calculating an FRF
 
-# Paramètres
-* ωₙ : Pulsations de résonance
-* ξₙ : Amortissements modaux
-* ϕₑ : Déformée modale aux points d'excitation
-* ϕₒ : Déformée modale aux points d'observation
-* freq : Fréquences d'intérêt
+# Parameters
+* ωₙ : Resonance frequencies
+* ξₙ : Modal damping ratios
+* ϕₑ : Mode shapes at excitation points
+* ϕₒ : Mode shapes at observation points
+* freq : Frequencies of interest
 
 # Note
-Les déformées modales doivent être normées à la masse
+The mode shapes must be mass-normalized
 """
 struct ModalFRF
     ωₙ :: Vector{Float64}
@@ -20,15 +20,15 @@ struct ModalFRF
 end
 
 """
-Structure contenant les données alimentant le solver direct de calcul d'une FRF
+Structure containing the data feeding the direct solver for calculating an FRF
 
-# Paramètres
-* K : Matrice de raideur
-* M : Matrice de masse
-* C : Matrice d'amortissement
-* exc_dofs : Degrés de liberté d'excitation
-* obs_dofs : Degrés de liberté d'observation
-* freq : Fréquences d'intérêt
+# Parameters
+* K : Stiffness matrix
+* M : Mass matrix
+* C : Damping matrix
+* exc_dofs : Degrees of freedom of excitation
+* obs_dofs : Degrees of freedom of observation
+* freq : Frequencies of interest
 """
 struct DirectFRF
     K
@@ -43,13 +43,13 @@ end
     frf(m::ModalFRF)
     frf(m::DirectFRF)
 
-Calcul de la matrice des FRF par approche modale ou directe
+Computes the FRF matrix by modal or direct approach
 
-# Paramètre
-* m : Structure contenant les données du problème
+# Parameter
+* m : Structure containing the problem data
 
-# Sortie
-* FRF : Matrice des FRF
+# Output
+* FRF : FRF matrix
 """
 function frf(m::ModalFRF, type = :dis)
     # Initialisation

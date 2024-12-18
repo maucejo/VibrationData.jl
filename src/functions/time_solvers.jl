@@ -110,7 +110,7 @@ struct GeneralizedAlpha
 
         return new(αf, αₘ, γ₀, β₀)
     end
-end # Alpha-généralisé
+end # Generalized-α
 
 @with_kw struct MidPoint
     αf::Float64 = 0.5

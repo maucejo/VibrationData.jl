@@ -1,17 +1,17 @@
 """
     modal_model(ωₙ, ηₙ)
 
-Calcul des matrices de masses raideur et amortissement généralisé
+Computes the modal mass, stiffness, and damping matrices
 
-# Paramètres
-    * p : Structure contenant les données relative à la plaque
-    * ωₙ : Vecteur des pulsations propres
-    * ξₙ : Amortissement modal
+# Parameters
+    * p : Structure containing data related to the plate
+    * ωₙ : Vector of natural frequencies
+    * ξₙ : Modal damping
 
-# Sorties
-    * Kₙ : Matrice de raideur généralisée
-    * Mₙ : Matrice de masse généralisées (matrice identidité, car normalisation à la masse)
-    * Cₙ : Matrice de masse généralisée
+# Outputs
+    * Kₙ : Generalized stiffness matrix
+    * Mₙ : Generalized mass matrix (identity matrix, due to mass normalization)
+    * Cₙ : Generalized damping matrix
 """
 function modal_model(ωₙ, ξₙ)
     return Diagonal(ωₙ.^2), I(length(ωₙ)), Diagonal(2ξₙ.*ωₙ)

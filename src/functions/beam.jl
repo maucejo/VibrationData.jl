@@ -1,17 +1,17 @@
 """
-Structure contenant les données de la poutre en flexion considérée homogène et isotrope
+Structure containing the data of a homogeneous and isotropic bending beam
 
-# Paramètres du problème
-* L : Longueur [m]
-* S : Aire de la section [m²]
-* I : Moment quadratique [m⁴]
-* E : Module d'Young [Pa]
-* ρ : Masse volumique [kg/m³]
+# Problem parameters
+* L : Length [m]
+* S : Cross-section area [m²]
+* I : Second moment of area [m⁴]
+* E : Young's modulus [Pa]
+* ρ : Density [kg/m³]
 
-# Paramètres du modèle
-* L : Longueur [m]
-* M : Masse linéique [kg/m]
-* D : Raideur de flexion [N.m²]
+# Model parameters
+* L : Length [m]
+* M : Linear mass density [kg/m]
+* D : Bending stiffness [N.m²]
 """
 @with_kw struct Beam
     L :: Float64
@@ -29,22 +29,22 @@ end
 """
     eigval(b::Beam, fₘₐₓ, bc)
 
-Calcul les fréquences propres d'une poutre en flexion jusqu'à fmax
+Computes the natural frequencies of a beam in bending up to fmax
 
-# Paramètres
-* p: Structure contenant les données relative à la barre
-* fₘₐₓ: Fréquence maximale de calcul des déformées modales [Hz]
-* bc: Conditions aux limites
-    * :SS : Appuyée - Appuyée
-    * :CC : Encastrée - Encastrée
-    * :SC : Appuyée - Encastrée
-    * :CF : Encastrée - Libre
-    * :SF : Appuyée - Libre
-    * :FF : Libre - Libre
+# Parameters
+* p: Structure containing the data related to the beam
+* fₘₐₓ: Maximum frequency for calculating the modal shapes [Hz]
+* bc: Boundary conditions
+    * :SS : Simply Supported - Simply Supported
+    * :CC : Clamped - Clamped
+    * :SC : Simply Supported - Clamped
+    * :CF : Clamped - Free
+    * :SF : Simply Supported - Free
+    * :FF : Free - Free
 
-# Sorties
-* ωₙ: Pulsations propres calculées jusqu'à ωmax = 2π*fmax [Hz]
-* kₙ: Vecteur des nombres d'onde modaux
+# Outputs
+* ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
+* kₙ: Vector of modal wave numbers
 """
 function eigval(b::Beam, fₘₐₓ, bc = :SS)
     (; L, m, D) = b
@@ -145,22 +145,22 @@ end
 """
     eigmode(b::Beam, kₙ, x, bc)
 
-Calcul les déformées propres d'une poutre en flexion
+Calculates the mass-normalized mode shapes of a beam in bending
 
-# Paramètres
-* b: Structure contenant les données relative à la poutre
-* kₙ: Vecteur des nombres d'ondes modaux
-* x: Coordonnées des points de calcul des déformées
-* bc: Conditions aux limites
-    * :SS : Appuyée - Appuyée
-    * :CC : Encastrée - Encastrée
-    * :CS : Encastrée - Appuyée
-    * :CF : Encastrée - Libre
-    * :SF : Appuyée - Libre
-    * :FF : Libre - Libre
+# Parameters
+* b: Structure containing the data related to the beam
+* kₙ: Vector of modal wave numbers
+* x: Coordinates of the points where the mode shapes are calculated
+* bc: Boundary conditions
+    * :SS : Simply Supported - Simply Supported
+    * :CC : Clamped - Clamped
+    * :CS : Clamped - Simply Supported
+    * :CF : Clamped - Free
+    * :SF : Simply Supported - Free
+    * :FF : Free - Free
 
-# Sorties
-* ϕ: Déformées modales normalisées à la masse
+# Output
+* ϕ: Mass-normalized mode shapes
 """
 function eigmode(b::Beam, kₙ, x, bc = :SS)
     (; L, m) = b

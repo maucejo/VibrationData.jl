@@ -1,5 +1,5 @@
 using LazyGrids
-using VibData
+using VibrationData
 
 ## Définition de la structure - Plaque
 plaq = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
