@@ -1,4 +1,4 @@
-using VibData
+using VibrationData
 using TestItems
 using TestItemRunner
 
@@ -69,7 +69,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :rectangle, F₀ = 1., td = 8e-3, duree = 1e-2)
+    param = (type = :rectangle, F₀ = 1., ts = 8e-3, duration = 1e-2)
     Ft = excitation(param, t)
 
     pos = findall(Ft .== 1.)
@@ -82,7 +82,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :marteau, F₀ = 1., td = 8e-3, k = 9.7, θ = 6e-4)
+    param = (type = :hammer, F₀ = 1., ts = 8e-3, k = 9.7, θ = 6e-4)
     Ft = excitation(param, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
@@ -94,7 +94,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :triangle, F₀ = 1., td = 8e-3, duree = 5e-2)
+    param = (type = :triangle, F₀ = 1., ts = 8e-3, duration = 5e-2)
     Ft = excitation(param, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
@@ -106,7 +106,7 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :srect, F₀ = 1., td = 8e-3, tm = 5e-3, duree = 5e-2)
+    param = (type = :srect, F₀ = 1., ts = 8e-3, tr = 5e-3, duration = 5e-2)
     Ft = excitation(param, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
@@ -127,7 +127,7 @@ end
     t = 0.:Δt:tf
     loc = [0.1, 0.2]
 
-    param = (type = :marteau, F₀ = 1., td = 8e-3, k = 9.7, θ = 6e-4)
+    param = (type = :hammer, F₀ = 1., ts = 8e-3, k = 9.7, θ = 6e-4)
 
     ϕₑ = eigmode(plaq, kₙ, loc[1], loc[2])
     F = excitation(param, t)
