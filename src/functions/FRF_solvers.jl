@@ -58,19 +58,19 @@ function frf(m::ModalFRF, type = :dis)
     Nₒ = size(ϕₒ, 1)
     Nf = length(freq)
 
-    FRF = zeros(Complex{Float64}, Nₒ, Nₑ, Nf)
+    FRF = [Matrix{ComplexF64}(undef, Nₒ, Nₑ) for _ in 1:Nf]
 
     ωf = 2π*freq
     p = Progress(Nf, color=:black, barlen=75, showspeed=true)
     @inbounds for (f, ω) in enumerate(ωf)
         next!(p)
-        M = spdiagm(@. 1/(ωₙ^2 - ω^2 + 2im*ξₙ*ωₙ*ω))
-        FRF[:, :, f] = ϕₑ*M*ϕₒ'
+        M = Diagonal(@. 1/(ωₙ^2 - ω^2 + 2im*ξₙ*ωₙ*ω))
+        FRF[f] = ϕₑ*M*ϕₒ'
 
         if type == :vel
-            FRF[:, :, f] *= 1im*ω
+            FRF[f] *= 1im*ω
         elseif type == :acc
-            FRF[:, :, f] *= -ω^2
+            FRF[f] *= -ω^2
         end
     end
 

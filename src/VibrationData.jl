@@ -1,6 +1,6 @@
 module VibrationData
 
-using Parameters, ProgressMeter, LinearAlgebra, SparseArrays
+using Parameters, ProgressMeter, LinearAlgebra
 
 # Structs
 export Plate, Bar, Rod, Beam,

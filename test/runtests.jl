@@ -224,13 +224,15 @@ end
     ξ = 1e-2
     prob = ModalFRF(ωₙ, ξ, ϕₑ, ϕₑ, freq)
 
-    FRF = frf(prob, :acc)
+    _FRF = frf(prob, :acc)
+
+    FRF = reduce(hcat, _FRF)[:]
 
     f = ωₙ[1]/2π
-    pos_max = argmax(abs.(FRF[1, 1, :]))
+    pos_max = argmax(abs.(FRF))
     @test (abs(freq[pos_max] - f))/f ≤ 1e-2
 
     maxAccth = ϕₑ[:, 1][1]^2/2ξ
-    maxAcc = maximum(abs.(FRF[1, 1, :]))
+    maxAcc = maximum(abs.(FRF))
     @test abs(maxAcc - maxAccth)/maxAccth ≤ 3e-2
 end

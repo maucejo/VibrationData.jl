@@ -40,7 +40,7 @@ The package is organized into the following functionalities:
 
 ### Vibration data generation
 
-- [x] Time-domain integration scheme for linear systems
+- [x] Time-domain integration schemes for linear systems
     - Central difference scheme
     - RK4
     - Newmark-beta method
@@ -49,7 +49,7 @@ The package is organized into the following functionalities:
     - Generalized-alpha
     - Mid-Point rule
 
-- [x] Frequency-domain calculation for linear systems
+- [x] Frequency-domain calculations for linear systems
     - Frequency response function (FRF)
         - [x] Modal summation
         - [ ] Direct method
