@@ -40,6 +40,13 @@ The package is organized into the following functionalities:
 
 ### Vibration data generation
 
+- [x] Excitation signals
+    - [x] White noise
+    - [x] Triangle wave
+    - [x] Rectangular wave
+    - [x] Hammer impact
+    - [x] Smoothed rectangular wave
+
 - [x] Time-domain integration schemes for linear systems
     - Central difference scheme
     - RK4

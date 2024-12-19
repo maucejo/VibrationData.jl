@@ -1,9 +1,9 @@
 module VibrationData
 
-using Parameters, ProgressMeter, LinearAlgebra
+using Parameters, ProgressMeter, LinearAlgebra, DSP
 
 # Structs
-export Plate, Bar, Rod, Beam,
+export Plate, Bar, Rod, Beam, SDOF,
        LinearTimeProblem, TimeSolution,
        ModalFRF, DirectFRF
 
@@ -21,6 +21,7 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
 export agwn, varest, estimated_SNR
 
 include("functions/excitation.jl")
+include("functions/sdof.jl")
 include("functions/plate.jl")
 include("functions/bar_rod.jl")
 include("functions/beam.jl")

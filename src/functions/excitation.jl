@@ -31,6 +31,9 @@ function excitation(param, t)
     elseif type == :rectangle
         (; duration) = param
         F = rectangle(F₀, ts, duration, t)
+    elseif type == :random
+        (; duration, σ)
+        F = random(F₀, ts, duration, σ, t)
     elseif type == :hammer
         (; k, θ) = param
         F = hammer(F₀, ts, k, θ, t)
@@ -94,6 +97,34 @@ function rectangle(F₀, ts, duration, t)
     pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
 
     Ft[pos_exc_t] .= F₀
+
+    return Ft
+end
+
+"""
+    random(F₀, ts, duration, σ, t)
+
+Computes the excitation vector for a random signal
+
+# Parameters
+* F₀ : Amplitude of the excitation [N]
+* ts : Time of force initiation [s]
+* duration : Duration of the excitation [s]
+* σ : Standard deviation of the random noise
+* t : Time discretization [s]
+
+# Output
+* Ft : Vector of excitation evolution over time [N]
+"""
+function random(F₀, ts, duration, σ, t)
+    Ft = zeros(length(t))
+
+    pos_start = argmin((t .- ts).^2.)
+    pos_end = argmin((t .- ts .- duration).^2.)
+
+    pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
+
+    Ft[pos_exc_t] .= F₀ + σ*randn(length(pos_exc_t))
 
     return Ft
 end
