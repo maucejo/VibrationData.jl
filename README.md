@@ -21,7 +21,7 @@ The package is organized into the following functionalities:
 
 ### Mechanical models
 
-- [ ] Single-degree-of-freedom (SDOF) systems
+- [x] Single-degree-of-freedom (SDOF) systems
 - [ ] Discrete multi-degree-of-freedom (MDOF) systems
     - [ ] Spring-mass-damper systems
     - [ ] Finite element models
@@ -46,6 +46,11 @@ The package is organized into the following functionalities:
     - [x] Rectangular wave
     - [x] Hammer impact
     - [x] Smoothed rectangular wave
+
+- [x] Solution for SDOF systems
+    - [x] Free response
+    - [x] Forced response due to a harmonic force or a base motion
+    - [x] Forced response due to any external force
 
 - [x] Time-domain integration schemes for linear systems
     - Central difference scheme

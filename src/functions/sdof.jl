@@ -58,13 +58,13 @@ function free_response(s :: SDOF, t, x₀ = 0., v₀ = 1.)
 end
 
 """
-    forced_response_harmo(s::SDOF, F, ω, t, x₀ = 0., v₀ = 0.)
+    forced_response_harmo(s::SDOF, Amp, ω, t, x₀ = 0., v₀ = 0., type= :force)
 
-Computes the forced response of a single degree of freedom (SDOF) system due to a harmonic excitation
+Computes the forced response of a single degree of freedom (SDOF) system due to a harmonic external force or base motion
 
 # Inputs
 - s: Structure containing the parameters of the SDOF system
-- F₀: Amplitude of the excitation [N]
+- Amp: Amplitude of the force excitation [N]or base motion [m]
 - ω: Frequency of the excitation [rad/s]
 - t: A vector of time points at which to evaluate the response
 - x₀: Initial displacement (default is 0.)
@@ -74,13 +74,17 @@ Computes the forced response of a single degree of freedom (SDOF) system due to 
 - x: Response of the system at the given time points
 - xh: Homogeneous solution
 - xp: Particular solution
-- F: Excitation force
 """
-function forced_response_harmo(s:: SDOF, F₀, ω, t, x₀ = 0., v₀ = 0.)
+function forced_response_harmo(s:: SDOF, F₀, ω, t, x₀ = 0., v₀ = 0., type = :force)
     (; m, ω₀, ξ) = s
 
-    A₀ = F₀/m/√((ω₀^2 - ω^2)^2 + (2ξ*ω*ω₀)^2)
-    ϕ = atan(2ξ*ω*ω₀, ω₀^2 - ω^2)
+    if type == :force
+        A₀ = Amp/m/√((ω₀^2 - ω^2)^2 + (2ξ*ω*ω₀)^2)
+        ϕ = atan(2ξ*ω*ω₀, ω₀^2 - ω^2)
+    else
+        A₀ = X₀*√(ω₀^4 + (2ξ*ω*ω₀)^2)/√((ω₀^2 - ω^2)^2 + (2ξ*ω*ω₀)^2)
+        ϕ = atan(2ξ*ω*ω₀, ω₀^2 - ω^2) - atan(2ξ*ω, ω₀)
+    end
 
     A = x₀ - A₀*cos(ϕ)
     if ξ < 1.
@@ -99,52 +103,7 @@ function forced_response_harmo(s:: SDOF, F₀, ω, t, x₀ = 0., v₀ = 0.)
     xp = A₀*cos.(ω*t .- ϕ)
     x = xh .+ xp
 
-    return x, xh, xp, F*cos.(ω*t)
-end
-
-"""
-    forced_response_base_harmo(s::SDOF, F, ω, t, x₀ = 0., v₀ = 0.)
-
-Computes the forced response of a single degree of freedom (SDOF) system due to a harmonic base motion
-
-# Inputs
-- s: Structure containing the parameters of the SDOF system
-- X₀: Amplitude of the base motion [m]
-- ω: Frequency of the excitation [rad/s]
-- t: A vector of time points at which to evaluate the response
-- x₀: Initial displacement (default is 0.)
-- v₀: Initial velocity (default is 0.)
-
-# Outputs
-- x: Response of the system at the given time points
-- xh: Homogeneous solution
-- xp: Particular solution
-- X: Excitation base motion
-"""
-function forced_response_base_harmo(s:: SDOF, X₀, ω, t, x₀ = 0., v₀ = 0.)
-    (; ω₀, ξ) = s
-
-    A₀ = X₀*√(ω₀^4 + (2ξ*ω*ω₀)^2)/√((ω₀^2 - ω^2)^2 + (2ξ*ω*ω₀)^2)
-    ϕ = atan(2ξ*ω*ω₀, ω₀^2 - ω^2) - atan(2ξ*ω, ω₀)
-
-    A = x₀ - A₀*cos(ϕ)
-    if ξ < 1.
-        Ω₀ = ω₀*√(1 - ξ^2)
-        B = (v₀ + ξ*ω₀*A - A₀*sin(ϕ))/Ω₀
-        xh = @. (A*cos(Ω₀*t) + B*sin(Ω₀*t))*exp(-ξ*ω₀*t)
-    elseif B == 1.
-        B = v₀ + ω₀*A - A₀*sin(ϕ)
-        xh = @. (A + B*t)*exp(-ω₀*t)
-    else
-        β = ω₀*√(ξ^2 - 1)
-        B = (v₀ + ξ*ω₀*A - A₀*sin(ϕ))/β
-        xh = @. (A*cosh(β*t) + B*sinh(β*t))*exp(-ξ*ω₀*t)
-    end
-
-    xp = A₀*cos.(ω*t .- ϕ)
-    x = xh .+ xp
-
-    return x, xh, xp, X₀*cos.(ω*t)
+    return x, xh, xp
 end
 
 function forced_response_any(s:: SDOF, F, t, x₀ = 0., v₀ = 0.)
