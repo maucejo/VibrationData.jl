@@ -3,6 +3,7 @@ using GLMakie
 
 includet("../src/models/sdof.jl")
 includet("../src/utils/excitation.jl")
+includet("../src/utils/calculus.jl")
 
 # SDOF system
 m = 1.
