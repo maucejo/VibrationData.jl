@@ -1,8 +1,8 @@
 using Parameters, DSP, LinearAlgebra
 using GLMakie
 
-includet("../src/functions/sdof.jl")
-includet("../src/functions/excitation.jl")
+includet("../src/models/sdof.jl")
+includet("../src/utils/excitation.jl")
 
 # SDOF system
 m = 1.

@@ -20,14 +20,14 @@ export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
 # Noise utils
 export agwn, varest, estimated_SNR
 
-include("functions/excitation.jl")
-include("functions/sdof.jl")
-include("functions/plate.jl")
-include("functions/bar_rod.jl")
-include("functions/beam.jl")
-include("functions/model.jl")
-include("functions/time_solvers.jl")
-include("functions/FRF_solvers.jl")
-include("functions/noise.jl")
+include("models/sdof.jl")
+include("models/plate.jl")
+include("models/bar_rod.jl")
+include("models/beam.jl")
+include("models/model.jl")
+include("solvers/time_solvers.jl")
+include("solvers/FRF_solvers.jl")
+include("utils/excitation.jl")
+include("utils/noise.jl")
 
 end
