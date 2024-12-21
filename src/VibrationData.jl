@@ -1,6 +1,6 @@
 module VibrationData
 
-using Parameters, ProgressMeter, LinearAlgebra, DSP
+using Parameters, ProgressMeter, LinearAlgebra, DSP, Interpolations
 
 # Structs
 export Plate, Bar, Rod, Beam, SDOF,
