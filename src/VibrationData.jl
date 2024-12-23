@@ -3,16 +3,17 @@ module VibrationData
 using Parameters, ProgressMeter, LinearAlgebra,
       DSP, Interpolations, PrecompileTools
 
-# Structs
-export Plate, Bar, Rod, Beam, SDOF,
-       LinearTimeProblem, TimeSolution,
-       ModalFRF, DirectFRF
+# Structs - Models
+export Plate, Bar, Rod, Beam, SDOF
+
+# Structs - Excitations
+export Rectangle, Triangle, RandomExc, Hammer, SmoothRect
+
+# Structs - Problems
+LinearTimeProblem, ModalFRF, DirectFRF
 
 # Functions
-export excitation,
-       eigval, eigmode, modal_model,
-       solve,
-       frf
+export eigval, eigmode, modal_model, solve, frf
 
 # Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,
@@ -37,5 +38,5 @@ include("utils/excitation.jl")
 include("utils/noise.jl")
 
 # Include files - Precompilation
-include("precompilation/precompilation.jl")
+# include("precompilation/precompilation.jl")
 end

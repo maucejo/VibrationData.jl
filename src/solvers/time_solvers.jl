@@ -136,6 +136,7 @@ end # Mid-Point rule
 
 # Central-difference algorithm
 function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
+
     (; K, M, C, F, t) = prob
 
     nt = length(t)
@@ -156,6 +157,7 @@ function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
     A[:, 1] = LU\rhs0
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
+
     p = Progress(nt - 1; desc = "Central difference...", color = :black, barlen = 75, showspeed = true)
     for n in 1:nt-1
         next!(p)
@@ -175,6 +177,7 @@ function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
 end
 
 function solve(prob::LinearTimeProblem, u0, alg::RK4)
+
     (; K, M, C, F, t) = prob
 
     nt = length(t)
@@ -216,6 +219,7 @@ function solve(prob::LinearTimeProblem, u0, alg::RK4)
 end
 
 function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
+
     (; K, M, C, F, t) = prob
     (; αf, αₘ, γ₀, β₀, name) = alg
 

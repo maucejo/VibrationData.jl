@@ -69,8 +69,8 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :rectangle, F₀ = 1., ts = 8e-3, duration = 1e-2)
-    Ft = excitation(param, t)
+    rect = Rectangle(1., 8e-3, 1e-2)
+    Ft = excitation(rect, t)
 
     pos = findall(Ft .== 1.)
     @test maximum(Ft) == 1.
@@ -82,8 +82,8 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :hammer, F₀ = 1., ts = 8e-3, k = 9.7, θ = 6e-4)
-    Ft = excitation(param, t)
+    hammer = Hammer(1., 8e-3, 9.7, 6e-4)
+    Ft = excitation(hammer, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
     @test round(length(t)*sum(Ft)*Δt) == 314.
@@ -94,8 +94,8 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :triangle, F₀ = 1., ts = 8e-3, duration = 5e-2)
-    Ft = excitation(param, t)
+    triangle = Triangle(1. , 8e-3, 5e-2)
+    Ft = excitation(triangle, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
     @test isapprox(sum(diff(Ft)), 0., atol = eps())
@@ -106,18 +106,33 @@ end
     tf = 0.07 # instant final
     t = 0.:Δt:tf
 
-    param = (type = :srect, F₀ = 1., ts = 8e-3, tr = 5e-3, duration = 5e-2)
-    Ft = excitation(param, t)
+    srect = SmoothRect(1., 8e-3, 5e-3, 5e-2)
+    Ft = excitation(srect, t)
 
     @test round(maximum(Ft), digits = 2) == 1.
     @test sum(diff(Ft)) == 0.
 end
 
+@testitem "Random force" begin
+    Δt = 1e-6 # Pas de temps
+    tf = 0.07 # instant final
+    t = 0.:Δt:tf
+
+    randexc = RandomExc(1., 8e-3, 5e-2, 0.1)
+    Ft = excitation(randexc, t)
+
+    Frand = Ft[8e-3 .≤ t .≤ 5.8e-2]
+    Fmean = sum(Frand)/length(Frand)
+    Fstd = sqrt(sum(abs2, Frand .- Fmean)/(length(Frand) - 1))
+    @test abs(round(Fmean, digits = 2) - 1.) ≤ 1e-2
+    @test abs(round(Fstd, digits = 2) - 0.1)/0.1 ≤ 1e-2
+end
+
 @testitem "Time solvers" begin
-    plaq = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
+    plate = Plate(0.6, 0.4, 5e-3, 2.1e11, 7800., 0.3)
 
     fmax = 1e3
-    ωₙ, kₙ = eigval(plaq, fmax)
+    ωₙ, kₙ = eigval(plate, fmax)
     Nmodes = length(ωₙ)
 
     Kₙ, Mₙ, Cₙ = modal_model(ωₙ, 1e-2)
@@ -127,13 +142,12 @@ end
     t = 0.:Δt:tf
     loc = [0.1, 0.2]
 
-    param = (type = :hammer, F₀ = 1., ts = 8e-3, k = 9.7, θ = 6e-4)
-
-    ϕₑ = eigmode(plaq, kₙ, loc[1], loc[2])
-    F = excitation(param, t)
+    hammer = Hammer(1., 8e-3, 9.7, 6e-4)
+    F = excitation(hammer, t)
+    ϕₑ = eigmode(plate, kₙ, loc[1], loc[2])
     Fₙ = (F*ϕₑ)'
 
-    ϕₒ = eigmode(plaq, kₙ, loc[1], loc[2])
+    ϕₒ = eigmode(plate, kₙ, loc[1], loc[2])
 
     prob = LinearTimeProblem(Kₙ, Mₙ, Cₙ, Fₙ, t)
     CI = (D₀ = zeros(Nmodes), V₀ = zeros(Nmodes))

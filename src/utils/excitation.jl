@@ -1,94 +1,109 @@
 """
-    excitation(param, t)
+    Rectangle(F₀, ts, duration)
+
+Struct to define a rectangular excitation signal
+
+# Parameters
+* F₀ : Amplitude of the force [N]
+* ts : Starting time of the excitation [s]
+* duration : Duration of the excitation [s]
+"""
+@with_kw struct Rectangle
+    F₀::Float64
+    ts::Float64
+    duration::Float64
+end
+
+"""
+    Triangle(F₀, ts, duration)
+
+Struct to define a triangular excitation signal
+
+# Parameters
+* F₀ : Amplitude of the force [N]
+* ts : Starting time of the excitation [s]
+* duration : Duration of the excitation [s]
+"""
+@with_kw struct Triangle
+    F₀::Float64
+    ts::Float64
+    duration::Float64
+end
+
+"""
+    RandomExc(F₀, ts, duration, σ)
+
+Struct to define a random excitation signal
+
+# Parameters
+* F₀ : Amplitude of the force [N]
+* ts : Starting time of the excitation [s]
+* duration : Duration of the excitation [s]
+* σ : Standard deviation of the random excitation
+"""
+@with_kw struct RandomExc
+    F₀::Float64
+    ts::Float64
+    duration::Float64
+    σ::Float64
+end
+
+"""
+    Hammer(F₀, ts, k, θ)
+
+Struct to define a hammer impact excitation signal
+
+# Parameters
+* F₀ : Amplitude of the force [N]
+* ts : Starting time of the excitation [s]
+* k : Shape parameter
+* θ : Intensity parameter [s]
+"""
+@with_kw struct Hammer
+    F₀::Float64
+    ts::Float64
+    k::Float64
+    θ::Float64
+end
+
+"""
+    SmoothRect(F₀, ts, tr, duration)
+
+Struct to define a smooth rectangular excitation signal
+
+# Parameters
+* F₀ : Amplitude of the force [N]
+* ts : Starting time of the excitation [s]
+* tr : Rise time from 0 to F₀ [s]
+* duration : Duration of the excitation [s]
+"""
+@with_kw struct SmoothRect
+    F₀::Float64
+    ts::Float64
+    tr::Float64
+    duration::Float64
+end
+
+"""
+    excitation(type, t)
 
 Computes different types of excitation signals
 
 # Parameters
-* param : NamedTuple or struct containing the following fields:
-    * type : type of excitation
-        1. :triangle
-        2. :rectangle
-        3. :hammer
-        4. :srect (smooth rectangle)
-    * F₀ : Amplitude of the force [N]
-    * ts : Time of force initiation [s]
-    * duration : Duration of the excitation [s]
-        *note : Mandatory for types 1, 2, and 4, not needed for type 3*
-    * k and θ : Shape parameter [-] and intensity parameter [s]
-        *note : Mandatory for type 3, not needed for other types*
-    * tr : Rise time from 0 to F₀ [s]
-        *note : Mandatory for type 4, not needed for other types*
+* type : Struct of excitation type
+    1. Triangle
+    2. Rectangle
+    3. Hammer
+    4. SmoothRect
+    5. Random
 
 # Output
 * F : Vector of excitation evolution over time [N]
 """
-function excitation(param, t)
-    (; type, F₀, ts) = param
+# Rectangle excitation
+function excitation(type::Rectangle, t)
 
-    if type == :triangle
-        (; duration) = param
-        F = triangle(F₀, ts, duration, t)
-    elseif type == :rectangle
-        (; duration) = param
-        F = rectangle(F₀, ts, duration, t)
-    elseif type == :random
-        (; duration, σ)
-        F = random(F₀, ts, duration, σ, t)
-    elseif type == :hammer
-        (; k, θ) = param
-        F = hammer(F₀, ts, k, θ, t)
-    elseif type == :srect
-        (; tr, duration) = param
-        F = smooth_rect(F₀, ts, tr, duration, t)
-    else
-        error("Excitation type not implemented")
-    end
-end
-
-"""
-    triangle(F₀, ts, duration, t)
-
-Computes the excitation vector for a triangular signal
-
-# Parameters
-* F₀ : Amplitude of the excitation [N]
-* ts : Time of force initiation [s]
-* duration : Duration of the excitation [s]
-* t : Time discretization [s]
-
-# Output
-* Ft : Vector of excitation evolution over time [N]
-"""
-function triangle(F₀, ts, duration, t)
-    Ft = zeros(length(t))
-
-    tr = (2ts + duration)/2.
-    pos_start = argmin((t .- ts).^2.)
-    pos_middle = argmin((t .- tr).^2.)
-    pos_end = argmin((t .- ts .- duration).^2.)
-    amp = 2F₀/duration
-
-    Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] .- ts)
-    Ft[pos_middle + 1:pos_end] = F₀ .- amp*(t[pos_middle + 1:pos_end] .- tr)
-
-    return Ft
-end
-
-"""
-    rectangle(F₀, ts, duration, t)
-
-Computes the excitation vector for a rectangular signal
-
-# Parameters
-* F₀ : Amplitude of the excitation [N]
-* ts : Time of force initiation [s]
-* duration : Duration of the excitation [s]
-* t : Time discretization [s]
-
-# Output
-* Ft : Vector of excitation evolution over time [N]
-"""
-function rectangle(F₀, ts, duration, t)
+    (; F₀, ts, duration) = type
     Ft = zeros(length(t))
 
     pos_start = argmin((t .- ts).^2.)
@@ -101,22 +116,30 @@ function rectangle(F₀, ts, duration, t)
     return Ft
 end
 
-"""
-    random(F₀, ts, duration, σ, t)
+# Triangle excitation
+function excitation(type::Triangle, t)
 
-Computes the excitation vector for a random signal
+    (; F₀, ts, duration) = type
 
-# Parameters
-* F₀ : Amplitude of the excitation [N]
-* ts : Time of force initiation [s]
-* duration : Duration of the excitation [s]
-* σ : Standard deviation of the random noise
-* t : Time discretization [s]
+    Ft = zeros(length(t))
 
-# Output
-* Ft : Vector of excitation evolution over time [N]
-"""
-function random(F₀, ts, duration, σ, t)
+    tr = (2ts + duration)/2.
+    pos_start = argmin((t .- ts).^2.)
+    pos_middle = argmin((t .- tr).^2.)
+    pos_end = argmin((t .- ts .- duration).^2.)
+    amp = 2F₀/duration
+
+    Ft[pos_start:pos_middle] = amp*(t[pos_start:pos_middle] .- type.ts)
+    Ft[pos_middle + 1:pos_end] = F₀ .- amp*(t[pos_middle + 1:pos_end] .- tr)
+
+    return Ft
+end
+
+# Random excitation
+function excitation(type::RandomExc, t)
+
+    (; F₀, ts, duration, σ) = type
+
     Ft = zeros(length(t))
 
     pos_start = argmin((t .- ts).^2.)
@@ -124,29 +147,16 @@ function random(F₀, ts, duration, σ, t)
 
     pos_exc_t = findall(t[pos_start] .≤ t .≤ t[pos_end])
 
-    Ft[pos_exc_t] .= F₀ + σ*randn(length(pos_exc_t))
+    Ft[pos_exc_t] .= F₀ .+ σ*randn(length(pos_exc_t))
 
     return Ft
 end
 
-"""
-    hammer(F₀, ts, k, θ, t)
+# Hammer excitation
+function excitation(type::Hammer, t)
 
-Computes the excitation vector for a hammer impact signal
-The hammer impact is assumed to have the shape of a gamma distribution
-with parameters (k, theta)
+    (; F₀, ts, k, θ) = type
 
-# Parameters
-* F₀ : Amplitude of the excitation [N]
-* ts : Time of force initiation [s]
-* k : Shape parameter
-* θ : Intensity parameter [s]
-* t : Time discretization [s]
-
-# Output
-* Ft : Vector of excitation evolution over time [N]
-"""
-function hammer(F₀, ts, k, θ, t)
     Ft = zeros(length(t))
 
     if !isa(t, Array)
@@ -162,23 +172,11 @@ function hammer(F₀, ts, k, θ, t)
     return Ft
 end
 
-"""
-    smooth_rect(F₀, ts, tr, duration, t)
+# Smooth rectangular excitation
+function excitation(type::SmoothRect, t)
 
-Computes the excitation vector for a smooth rectangular signal.
-The excitation is modeled by a Tuckey window.
+    (; F₀, ts, tr, duration) = type
 
-# Parameters
-* F₀ : Amplitude of the excitation [N]
-* ts : Time of force initiation [s]
-* tr : Rise time from 0 to F₀ [s]
-* duration : Duration of the excitation [s]
-* t : Time discretization [s]
-
-# Output
-* Ft : Vector of excitation evolution over time [N]
-"""
-function smooth_rect(F₀, ts, tr, duration, t)
     Ft = zeros(length(t))
 
     pos_start = argmin((t .- ts).^2.)
