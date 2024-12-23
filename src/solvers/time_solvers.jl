@@ -220,22 +220,22 @@ function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
     (; αf, αₘ, γ₀, β₀, name) = alg
 
     nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1) # Pas de temps
+    h = (maximum(t) - minimum(t))/(nt - 1) # time step
     Nddl = size(K)[1]
 
-    # Initialisation des matrices de résultat
+    # Initialization of the result matrices
     D = zeros(Nddl, nt)
     V = zeros(Nddl, nt)
     A = zeros(Nddl, nt)
 
-    # Calcul de l'accélération initiale
+    # Computation of the initial acceleration
     D[:, 1] = u0.D₀
     V[:, 1] = u0.V₀
 
     rhs0 = F[:, 1] - C*V[:, 1] - K*D[:, 1]
     A[:, 1] = M\rhs0
 
-    # Paramètre du schéma de Newmark
+    # Newmark scheme parameters
     γ = γ₀*(1. + 2αf - 2αₘ)
     β = β₀*(1. + αf - αₘ)^2
 
@@ -270,3 +270,6 @@ function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
 
     return TimeSolution(D, V, A)
 end
+
+# Default solver
+solve(prob::LinearTimeProblem, u0) = solve(prob, u0, GeneralizedAlpha())

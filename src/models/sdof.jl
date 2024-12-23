@@ -75,7 +75,7 @@ Computes the forced response of a single degree of freedom (SDOF) system due to 
 - xh: Homogeneous solution
 - xp: Particular solution
 """
-function forced_response_harmo(s:: SDOF, F₀, ω, t, x₀ = 0., v₀ = 0., type = :force)
+function forced_response_harmo(s::SDOF, Amp, ω, t, x₀ = 0., v₀ = 0.; type = :force)
     (; m, ω₀, ξ) = s
 
     if type == :force
@@ -106,7 +106,7 @@ function forced_response_harmo(s:: SDOF, F₀, ω, t, x₀ = 0., v₀ = 0., type
     return x, xh, xp
 end
 
-function forced_response_any(s:: SDOF, F, t, x₀ = 0., v₀ = 0.)
+function forced_response_any(s::SDOF, F, t, x₀ = 0., v₀ = 0.; type = :force)
     (; m, ω₀, ξ) = s
     # Time step
     Δt = t[2] - t[1]
@@ -126,6 +126,15 @@ function forced_response_any(s:: SDOF, F, t, x₀ = 0., v₀ = 0.)
     xh = free_response(s, t, x₀, v₀)[1]
 
     # Duhamel's integral
+    if type == :base
+        k = ω₀^2*m
+        c = 2ξ*ω₀*m
+        xb = F
+        vb = gradient(xb, t)
+
+        F = k*xb .+ c*vb
+    end
+
     xp = Δt*conv(F, h)[1:length(F)]
 
     return xh .+ xp

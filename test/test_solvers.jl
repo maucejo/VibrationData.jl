@@ -18,7 +18,7 @@ tf = 0.07 # instant final
 t = 0.:Δt:tf
 loc = [0.1, 0.2]
 
-param = (type = :hammer, F₀ = 1., td = 8e-3, k = 9.7, θ = 6e-4)
+param = (type = :hammer, F₀ = 1., ts = 8e-3, k = 9.7, θ = 6e-4)
 
 ϕₑ = eigmode(plaq, kₙ, loc[1], loc[2])
 F = excitation(param, t)

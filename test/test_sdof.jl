@@ -1,4 +1,4 @@
-using Parameters, DSP, LinearAlgebra
+using Parameters, DSP, LinearAlgebra, Interpolations
 using GLMakie
 
 includet("../src/models/sdof.jl")
