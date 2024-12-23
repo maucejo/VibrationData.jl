@@ -7,11 +7,11 @@ Structure containing data for the time solver
 * C: Damping matrix
 * t: Collection of calculation time steps
 """
-struct LinearTimeProblem
-    K
-    M
-    C
-    F
+@with_kw struct LinearTimeProblem
+    K :: Matrix{Float64}
+    M :: Matrix{Float64}
+    C :: Matrix{Float64}
+    F :: Matrix{Float64}
     t
 end
 
@@ -23,80 +23,92 @@ Structure containing problem solutions
 * V: Velocity matrix
 * A: Acceleration matrix
 """
-struct TimeSolution
+@with_kw struct TimeSolution
     D :: Matrix{Float64}
     V :: Matrix{Float64}
     A :: Matrix{Float64}
 end
 
-
 # Solvers
-struct CentralDiff end # Différences finies centrées
+struct CentralDiff end # Central difference scheme
 
-struct RK4 end # Runge-Kutta d'ordre 4
+struct RK4 end # Fourth-order Runge-Kutta
 
-@with_kw struct FoxGoodwin
-    αf::Float64 = 0.
-    αₘ::Float64 = 0.
-    γ₀::Float64 = 0.5
-    β₀::Float64 = 1/12
+# Newmark-Family
+abstract type NewmarkFamily end
+
+struct FoxGoodwin <: NewmarkFamily
+    αf::Float64
+    αₘ::Float64
+    γ₀::Float64
+    β₀::Float64
+    name::String
+
+    FoxGoodwin() = new(0., 0., 0.5, 1/12, "Fox-Goodwin...")
 end # Fox-Goodwin
 
-@with_kw struct LinearAcceleration
-    αf::Float64 = 0.
-    αₘ::Float64 = 0.
-    γ₀::Float64 = 0.5
-    β₀::Float64 = 1/6
+struct LinearAcceleration <: NewmarkFamily
+    αf::Float64
+    αₘ::Float64
+    γ₀::Float64
+    β₀::Float64
+    name::String
+
+    LinearAcceleration() = new(0., 0., 0.5, 1/6, "Linear acceleration...")
 end # Linear Acceleration
 
-struct Newmark
+struct Newmark <: NewmarkFamily
     αf::Float64
     αₘ::Float64
     γ₀::Float64
     β₀::Float64
+    name::String
 
-    Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀)
+    Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀, "Newmark...")
 end # Newmark
 
-struct HHT
+struct HHT <: NewmarkFamily
     αf::Float64
     αₘ::Float64
     γ₀::Float64
     β₀::Float64
+    name::String
 
     function HHT(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf)
         if αf ≠ Inf
             (0. < αf < 1/3) ? error("αf must be in [0, 1/3[") : nothing
-            return new(αf, 0., γ₀, β₀)
+            return new(αf, 0., γ₀, β₀, "HHT...")
         else
             ρ < 0.5 ? error("ρ must be in [0.5, 1]") : nothing
-            return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀)
+            return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀, "HHT...")
         end
     end
 end # Hilber-Hughes-Taylor
 
-struct WBZ
+struct WBZ <: NewmarkFamily
     αf::Float64
     αₘ::Float64
     γ₀::Float64
     β₀::Float64
+    name::String
 
     function WBZ(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αₘ = Inf)
         if αₘ ≠ Inf
             (αₘ ≤ 0.5) ? error("αₘ must be ≤ 0.5") : nothing
-            return new(0., αₘ, γ₀, β₀)
+            return new(0., αₘ, γ₀, β₀, "WBZ...")
         else
             (ρ > 1.) ? error("ρ must be in [0, 1]") : nothing
-            return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀)
+            return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀, "WBZ...")
         end
     end
 end # Wood-Bossak-Zienkiewicz
 
-struct GeneralizedAlpha
+struct GeneralizedAlpha <: NewmarkFamily
     αf::Float64
     αₘ::Float64
     γ₀::Float64
     β₀::Float64
+    name::String
 
     function GeneralizedAlpha(; γ₀ = 0.5, β₀ = 0.25, ρ = 1., αf = Inf, αₘ = Inf)
         if αf ≠ Inf && αₘ ≠ Inf
@@ -108,29 +120,22 @@ struct GeneralizedAlpha
             αₘ = 3αf - 1.
         end
 
-        return new(αf, αₘ, γ₀, β₀)
+        return new(αf, αₘ, γ₀, β₀, "Generalized-α...")
     end
 end # Generalized-α
 
-@with_kw struct MidPoint
-    αf::Float64 = 0.5
-    αₘ::Float64 = 0.5
-    γ₀::Float64 = 0.5
-    β₀::Float64 = 0.25
+struct MidPoint <: NewmarkFamily
+    αf::Float64
+    αₘ::Float64
+    γ₀::Float64
+    β₀::Float64
+    name::String
+
+    MidPoint() = new(0.5, 0.5, 0.5, 0.25, "Mid-point rule...")
 end # Mid-Point rule
 
-function solve(prob::LinearTimeProblem, u0, alg = GeneralizedAlpha())
-    if alg isa CentralDiff # Central-difference
-        return _CentralDiff(prob, u0)
-    elseif alg isa RK4 # Fourth-order Runge-Kutta
-        return _RK4(prob, u0)
-    else
-        return _NK(prob, u0, alg)
-    end
-end
-
 # Central-difference algorithm
-function _CentralDiff(prob::LinearTimeProblem, u0)
+function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
     (; K, M, C, F, t) = prob
 
     nt = length(t)
@@ -169,7 +174,7 @@ function _CentralDiff(prob::LinearTimeProblem, u0)
     return TimeSolution(D, V, A)
 end
 
-@views function _RK4(prob::LinearTimeProblem, u0)
+function solve(prob::LinearTimeProblem, u0, alg::RK4)
     (; K, M, C, F, t) = prob
 
     nt = length(t)
@@ -210,25 +215,9 @@ end
     return TimeSolution(D, V, A)
 end
 
-function _NK(prob::LinearTimeProblem, u0, alg) # Newmark-Family
+function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
     (; K, M, C, F, t) = prob
-    (; αf, αₘ, γ₀, β₀) = alg
-
-    if alg isa FoxGoodwin
-        desc = "Fox-Goodwin..."
-    elseif alg isa LinearAcceleration
-        desc = "Linear acceleration..."
-    elseif alg isa Newmark
-        desc = "Newmark..."
-    elseif alg isa HHT
-        desc = "HHT..."
-    elseif alg isa WBZ
-        desc = "WBZ..."
-    elseif alg isa GeneralizedAlpha
-        desc = "Generalized-α..."
-    elseif alg isa MidPoint
-        desc = "Mid-point rule..."
-    end
+    (; αf, αₘ, γ₀, β₀, name) = alg
 
     nt = length(t)
     h = (maximum(t) - minimum(t))/(nt - 1) # Pas de temps
@@ -269,7 +258,7 @@ function _NK(prob::LinearTimeProblem, u0, alg) # Newmark-Family
     S = @. b₆*M + b₃*C + b₄*K
     LU = lu(S)
 
-    p = Progress(nt - 1; desc = desc, color = :black, barlen = 75, showspeed = true)
+    p = Progress(nt - 1; desc = name, color = :black, barlen = 75, showspeed = true)
     for n = 1:nt-1
         next!(p)
         rhs = b₈.*F[:, n+1] + b₉.*F[:, n] - C*(b₁.*A[:, n] + V[:, n]) - K*(b₂.*A[:, n] + b₅.*V[:, n] + D[:, n]) - b₇.*(M*A[:, n])

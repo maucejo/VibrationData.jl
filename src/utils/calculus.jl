@@ -1,4 +1,4 @@
-function gradient(f, h = 1.)
+function gradient(f; h = 1.)
     n = length(f)
     df = zeros(n)
 

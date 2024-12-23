@@ -9,7 +9,7 @@ Structure containing the data of a sdof system
 @with_kw struct SDOF
     m :: Float64
     ω₀ ::Float64
-    ξ ::Float64
+    ξ :: Float64
 end
 
 """
