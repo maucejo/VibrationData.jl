@@ -10,10 +10,10 @@ export Plate, Bar, Rod, Beam, SDOF
 export Rectangle, Triangle, RandomExc, Hammer, SmoothRect
 
 # Structs - Problems
-LinearTimeProblem, ModalFRF, DirectFRF
+export LinearTimeProblem, ModalFRF, DirectFRF
 
 # Functions
-export eigval, eigmode, modal_model, solve, frf
+export excitation, eigval, eigmode, modal_model, solve, frf
 
 # Time solvers
 export CentralDiff, RK4, FoxGoodwin, LinearAcceleration,

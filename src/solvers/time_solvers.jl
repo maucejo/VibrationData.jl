@@ -158,8 +158,8 @@ function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
 
     D_1 = D[:, 1] - h.*V[:, 1] + (h^2 .*A[:, 1]./4)
 
-    p = Progress(nt - 1; desc = "Central difference...", color = :black, barlen = 75, showspeed = true)
-    for n in 1:nt-1
+    p = Progress(nt - 1, desc = "Central difference...", color = :black, showspeed = true)
+    @views @inbounds for n in 1:nt-1
         next!(p)
         if n == 1
             D[:, n+1] = 2D[:, n] - D_1 + (h^2 .*A[:, n])
@@ -197,8 +197,8 @@ function solve(prob::LinearTimeProblem, u0, alg::RK4)
     LU = lu(M)
     A[:, 1] = LU\rhs0
 
-    p = Progress(nt - 1; desc = "RK4...", color=:black, barlen=75, showspeed=true)
-    for n = 1:nt-1
+    p = Progress(nt - 1, desc = "RK4...", color=:black, showspeed=true)
+    @views @inbounds for n = 1:nt-1
         next!(p)
         Fn_2 = (F[:, n+1] + F[:, n])./2
 
@@ -262,8 +262,8 @@ function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
     S = @. b₆*M + b₃*C + b₄*K
     LU = lu(S)
 
-    p = Progress(nt - 1; desc = name, color = :black, barlen = 75, showspeed = true)
-    for n = 1:nt-1
+    p = Progress(nt - 1, desc = name, color = :black, showspeed = true)
+    @views @inbounds for n = 1:nt-1
         next!(p)
         rhs = b₈.*F[:, n+1] + b₉.*F[:, n] - C*(b₁.*A[:, n] + V[:, n]) - K*(b₂.*A[:, n] + b₅.*V[:, n] + D[:, n]) - b₇.*(M*A[:, n])
 

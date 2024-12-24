@@ -27,7 +27,7 @@ Compute the free response of a single degree of freedom (SDOF) system.
 - rep: The response of the system at the given time points
 - env: The envelope of the response
 """
-function free_response(s :: SDOF, t, x₀ = 0., v₀ = 1.)
+function free_response(s::SDOF, t, x₀ = 0., v₀ = 1.)
     (; ω₀, ξ) = s
     nt = length(t)
 
@@ -58,24 +58,34 @@ function free_response(s :: SDOF, t, x₀ = 0., v₀ = 1.)
 end
 
 """
-    forced_response_harmo(s::SDOF, Amp, ω, t, x₀ = 0., v₀ = 0., type= :force)
+    forced_response(s::SDOF, Amp::Float64, ω::Float64, t, x₀ = 0., v₀ = 0., type= :force)
+
+    forced_response(s::SDOF, F::Vector{Float64}, t, x₀ = 0., v₀ = 0.; type = :force)
 
 Computes the forced response of a single degree of freedom (SDOF) system due to a harmonic external force or base motion
 
 # Inputs
 - s: Structure containing the parameters of the SDOF system
-- Amp: Amplitude of the force excitation [N]or base motion [m]
-- ω: Frequency of the excitation [rad/s]
 - t: A vector of time points at which to evaluate the response
 - x₀: Initial displacement (default is 0.)
 - v₀: Initial velocity (default is 0.)
+- type: Type of excitation
+    - :force: External force (default)
+    - :base: Base motion
+
+For a harmonic force:
+- Amp: Amplitude of the force excitation [N]or base motion [m]
+- ω: Frequency of the excitation [rad/s]
+
+For any time dependence:
+- F: Vector of the force excitation [N] or base motion [m]
 
 # Outputs
 - x: Response of the system at the given time points
 - xh: Homogeneous solution
 - xp: Particular solution
 """
-function forced_response_harmo(s::SDOF, Amp, ω, t, x₀ = 0., v₀ = 0.; type = :force)
+function forced_response(s::SDOF, Amp::Float64, ω::Float64, t, x₀ = 0., v₀ = 0.; type = :force)
     (; m, ω₀, ξ) = s
 
     if type == :force
@@ -106,7 +116,7 @@ function forced_response_harmo(s::SDOF, Amp, ω, t, x₀ = 0., v₀ = 0.; type =
     return x, xh, xp
 end
 
-function forced_response_any(s::SDOF, F, t, x₀ = 0., v₀ = 0.; type = :force)
+function forced_response(s::SDOF, F::Vector{Float64}, t, x₀ = 0., v₀ = 0.; type = :force)
     (; m, ω₀, ξ) = s
     # Time step
     Δt = t[2] - t[1]
@@ -127,8 +137,7 @@ function forced_response_any(s::SDOF, F, t, x₀ = 0., v₀ = 0.; type = :force)
 
     # Duhamel's integral
     if type == :base
-        k = ω₀^2*m
-        c = 2ξ*ω₀*m
+        k, c = ω₀^2*m, 2ξ*ω₀*m
         xb = F
         vb = gradient(xb, t)
 
