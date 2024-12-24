@@ -1,3 +1,5 @@
+abstract type BarRod end
+
 """
 Structure containing the data of a homogeneous and isotropic longitudinal bar
 
@@ -12,7 +14,7 @@ Structure containing the data of a homogeneous and isotropic longitudinal bar
 * m : Line mass [kg/m]
 * D : Stiffness coefficient [Pa]
 """
-@with_kw struct Bar
+@with_kw struct Bar <: BarRod
     L::Float64
     m::Float64
     D::Float64
@@ -41,7 +43,7 @@ Structure containing the data of a homogeneous and isotropic torsional bar
 * m : Line mass [kg/m]
 * D : Stiffness coefficient [Pa]
 """
-@with_kw struct Rod
+@with_kw struct Rod <: BarRod
     L :: Float64
     m::Float64
     D::Float64
@@ -72,7 +74,7 @@ Computes the natural frequencies of a longitudinal or torsional bar up to fmax
 * ωₙ: Natural frequencies calculated up to ωmax = 2π*fmax [Hz]
 * kₙ: Vector of modal wavenumbers
 """
-function eigval(b, fmax, bc = :CC)
+function eigval(b::BarRod, fmax, bc = :CC)
     (; L, m, D) = b
 
     c = sqrt(D/m)
@@ -138,7 +140,7 @@ Computes the mass-normalized mode shapes of a longitudinal or torsional bar
 # Output
 * ϕ: Mass-normalized mode shapes
 """
-function eigmode(b, kₙ, x, bc = :CC)
+function eigmode(b::BarRod, kₙ, x, bc = :CC)
     (; L, m) = b
 
     if !isa(x, Array)
