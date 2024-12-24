@@ -12,7 +12,9 @@ Structure containing data for the time solver
     M :: Matrix{Float64}
     C :: Matrix{Float64}
     F :: Matrix{Float64}
-    t
+    h
+
+    LinearTimeProblem(K, M, C, F, t) = new(K, M, C, F, h = t[2] - t[1])
 end
 
 """
@@ -148,11 +150,10 @@ end
 # Central-difference
 function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
 
-    (; K, M, C, F, t) = prob
+    (; K, M, C, F, h) = prob
 
-    nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1)
-    Nddl = size(K)[1]
+    nt = size(F, 2)
+    Nddl = size(K, 1)
 
     # Initialization of the result matrices
     D = zeros(Nddl, nt)
@@ -190,11 +191,10 @@ end
 # Fourth-order Runge-Kutta
 function solve(prob::LinearTimeProblem, u0, alg::RK4)
 
-    (; K, M, C, F, t) = prob
+    (; K, M, C, F, h) = prob
 
-    nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1)
-    Nddl = size(K)[1]
+    nt = size(F, 2)
+    Nddl = size(K, 1)
 
     # Initialization of the result matrices
     D = zeros(Nddl, nt)
@@ -233,12 +233,11 @@ end
 #Newmark family
 function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
 
-    (; K, M, C, F, t) = prob
+    (; K, M, C, F, h) = prob
     (; αf, αₘ, γ₀, β₀, name) = alg
 
-    nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1)
-    Nddl = size(K)[1]
+    nt = size(F, 2)
+    Nddl = size(K, 1)
 
     # Initialization of the result matrices
     D = zeros(Nddl, nt)

@@ -31,7 +31,7 @@ include("models/model.jl")
 
 # Include files - Solvers
 include("solvers/time_solvers.jl")
-include("solvers/FRF_solvers.jl")
+include("solvers/frequency_solvers.jl")
 
 # Include files - Utils
 include("utils/excitation.jl")

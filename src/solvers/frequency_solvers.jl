@@ -31,9 +31,9 @@ Structure containing the data feeding the direct solver for calculating an FRF
 * freq : Frequencies of interest
 """
 struct DirectFRF
-    K
-    M
-    C
+    K :: Matrix{Float64}
+    M :: Matrix{Float64}
+    C :: Matrix{Float64}
     exc_dofs
     obs_dofs
     freq

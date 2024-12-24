@@ -148,3 +148,49 @@ function forced_response(s::SDOF, F::Vector{Float64}, t, x₀ = 0., v₀ = 0.; t
 
     return xh .+ xp
 end
+
+"""
+    frf(s::SDOF, freq; type = :force)
+
+Compute the frequency response function of a single degree of freedom (SDOF) system
+
+# Inputs
+- s: Structure containing the parameters of the SDOF system
+- freq: Vector of frequencies [Hz]
+- type: Type of excitation
+    - :force: Transfert function (default)
+    - :base: Transmissibility function
+
+# Output
+- H: FRF of the system at the given frequencies
+"""
+function frf(s::SDOF, freq; type = :force)
+    (; m, ω₀, ξ) = s
+    ω = 2π*freq
+
+    if type == :force
+        return @. 1/m/(ω₀^2 - ω^2 + 2im*ξ*ω₀*ω)
+    else
+        return @. (ω₀^2 + 2im*ξ*ω₀*ω)/(ω₀^2 - ω^2 + 2im*ξ*ω₀*ω)
+    end
+end
+
+"""
+    freq_response(s::SDOF, F::Vector{Float64}, freq; type = :force)
+
+Compute the frequency response of a single degree of freedom (SDOF) system due to an external force or a base motion
+
+# Inputs
+- s: Structure containing the parameters of the SDOF system
+- F: Vector of the force [N] or base motion amplitude [m]
+- freq: Vector of frequencies [Hz]
+- type: Type of excitation
+    - :force: External force (default)
+    - :base: Base motion
+
+# Output
+- y: Response of the system at the given frequencies
+"""
+function freq_response(s::SDOF, F::Vector{Float64}, freq; type = :force)
+    return frf(s, freq, type = type).*F
+end
