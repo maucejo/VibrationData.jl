@@ -14,7 +14,7 @@ Structure containing data for the time solver
     F :: Matrix{Float64}
     h
 
-    LinearTimeProblem(K, M, C, F, t) = new(K, M, C, F, h = t[2] - t[1])
+    LinearTimeProblem(K, M, C, F, t) = new(K, M, C, F, t[2] - t[1])
 end
 
 """
