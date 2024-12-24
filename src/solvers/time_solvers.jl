@@ -30,13 +30,16 @@ Structure containing problem solutions
 end
 
 # Solvers
-struct CentralDiff end # Central difference scheme
+# Central difference scheme
+struct CentralDiff end
 
-struct RK4 end # Fourth-order Runge-Kutta
+# Fourth-order Runge-Kutta
+struct RK4 end
 
-# Newmark-Family
+# Newmark-Family abstract type
 abstract type NewmarkFamily end
 
+# Fox-Goodwin
 struct FoxGoodwin <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -45,8 +48,9 @@ struct FoxGoodwin <: NewmarkFamily
     name::String
 
     FoxGoodwin() = new(0., 0., 0.5, 1/12, "Fox-Goodwin...")
-end # Fox-Goodwin
+end
 
+# Linear Acceleration
 struct LinearAcceleration <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -55,8 +59,9 @@ struct LinearAcceleration <: NewmarkFamily
     name::String
 
     LinearAcceleration() = new(0., 0., 0.5, 1/6, "Linear acceleration...")
-end # Linear Acceleration
+end
 
+# Newmark
 struct Newmark <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -65,8 +70,9 @@ struct Newmark <: NewmarkFamily
     name::String
 
     Newmark(; γ₀ = 0.5, β₀ = 0.25) = new(0., 0., γ₀, β₀, "Newmark...")
-end # Newmark
+end
 
+# Hilber-Hughes-Taylor
 struct HHT <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -83,8 +89,9 @@ struct HHT <: NewmarkFamily
             return new((1. - ρ)/(1. + ρ), 0., γ₀, β₀, "HHT...")
         end
     end
-end # Hilber-Hughes-Taylor
+end
 
+# Wood-Bossak-Zienkiewicz
 struct WBZ <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -101,8 +108,9 @@ struct WBZ <: NewmarkFamily
             return new(0., (ρ - 1.)/(ρ + 1.), γ₀, β₀, "WBZ...")
         end
     end
-end # Wood-Bossak-Zienkiewicz
+end
 
+# Generalized-α
 struct GeneralizedAlpha <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -122,8 +130,9 @@ struct GeneralizedAlpha <: NewmarkFamily
 
         return new(αf, αₘ, γ₀, β₀, "Generalized-α...")
     end
-end # Generalized-α
+end
 
+# Mid-Point rule
 struct MidPoint <: NewmarkFamily
     αf::Float64
     αₘ::Float64
@@ -132,23 +141,25 @@ struct MidPoint <: NewmarkFamily
     name::String
 
     MidPoint() = new(0.5, 0.5, 0.5, 0.25, "Mid-point rule...")
-end # Mid-Point rule
+end
 
-# Central-difference algorithm
+# Algorithms
+
+# Central-difference
 function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
 
     (; K, M, C, F, t) = prob
 
     nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1) # Pas de temps
+    h = (maximum(t) - minimum(t))/(nt - 1)
     Nddl = size(K)[1]
 
-    # Initialisation des matrices de résultat
+    # Initialization of the result matrices
     D = zeros(Nddl, nt)
     V = zeros(Nddl, nt)
     A = zeros(Nddl, nt)
 
-    # Calcul de l'accélération initiale
+    # Computation of the initial acceleration
     D[:, 1] = u0.D₀
     V[:, 1] = u0.V₀
 
@@ -176,20 +187,21 @@ function solve(prob::LinearTimeProblem, u0, alg::CentralDiff)
     return TimeSolution(D, V, A)
 end
 
+# Fourth-order Runge-Kutta
 function solve(prob::LinearTimeProblem, u0, alg::RK4)
 
     (; K, M, C, F, t) = prob
 
     nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1) # Pas de temps
+    h = (maximum(t) - minimum(t))/(nt - 1)
     Nddl = size(K)[1]
 
-    # Initialisation des matrices de résultat
+    # Initialization of the result matrices
     D = zeros(Nddl, nt)
     V = zeros(Nddl, nt)
     A = zeros(Nddl, nt)
 
-    # Calcul de l'accélération initiale
+    # Computation of the initial acceleration
     D[:, 1] = u0.D₀
     V[:, 1] = u0.V₀
 
@@ -218,13 +230,14 @@ function solve(prob::LinearTimeProblem, u0, alg::RK4)
     return TimeSolution(D, V, A)
 end
 
+#Newmark family
 function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
 
     (; K, M, C, F, t) = prob
     (; αf, αₘ, γ₀, β₀, name) = alg
 
     nt = length(t)
-    h = (maximum(t) - minimum(t))/(nt - 1) # time step
+    h = (maximum(t) - minimum(t))/(nt - 1)
     Nddl = size(K)[1]
 
     # Initialization of the result matrices
@@ -258,7 +271,7 @@ function solve(prob::LinearTimeProblem, u0, alg::NewmarkFamily)
     b₇ = αₘ
     b₉ = αf
 
-    # Calcul de la raideur effective
+    # Computation of the effective stiffness matrix
     S = @. b₆*M + b₃*C + b₄*K
     LU = lu(S)
 
